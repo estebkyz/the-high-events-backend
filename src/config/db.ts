@@ -56,14 +56,52 @@ const PRIMARY_KEYS: Record<string, string> = {
 }
 
 function loadFileDb(): TableStore {
+  let store: TableStore = {}
   try {
     if (fs.existsSync(DB_FILE)) {
-      return JSON.parse(fs.readFileSync(DB_FILE, "utf8"))
+      store = JSON.parse(fs.readFileSync(DB_FILE, "utf8"))
     }
   } catch {
     // ignore
   }
-  return {}
+
+  let modified = false
+  if (!store["rol"] || store["rol"].length === 0) {
+    store["rol"] = [
+      { id_rol: 1, nombre: "Administrador General", descripcion: "Acceso total al sistema", estado: 1, fecha_creacion: new Date().toISOString() },
+      { id_rol: 2, nombre: "Super Admin", descripcion: "Control de infraestructura", estado: 1, fecha_creacion: new Date().toISOString() },
+      { id_rol: 3, nombre: "Coordinador de Eventos", descripcion: "Gestión de eventos y tareas", estado: 1, fecha_creacion: new Date().toISOString() },
+      { id_rol: 4, nombre: "Financiero", descripcion: "Gestión de pagos y ventas", estado: 1, fecha_creacion: new Date().toISOString() },
+      { id_rol: 5, nombre: "Operador Técnico", descripcion: "Manejo de equipos en campo", estado: 1, fecha_creacion: new Date().toISOString() },
+      { id_rol: 6, nombre: "Comercial", descripcion: "Gestión de cotizaciones y clientes", estado: 1, fecha_creacion: new Date().toISOString() }
+    ]
+    modified = true
+  }
+
+  if (!store["usuario"] || store["usuario"].length === 0) {
+    store["usuario"] = [
+      {
+        id_usuario: 1,
+        rol_id: 1,
+        tipo_documento: "CC",
+        numero_documento: "0000000000",
+        nombre: "Admin",
+        apellido: "Demo",
+        correo: "admin@example.com",
+        telefono: "0000000000",
+        contrasena_hash: "REDACTED",
+        activo: 1,
+        fecha_creacion: new Date().toISOString()
+      }
+    ]
+    modified = true
+  }
+
+  if (modified) {
+    saveFileDb(store)
+  }
+
+  return store
 }
 
 function saveFileDb(store: TableStore): void {
