@@ -1,0 +1,39 @@
+# Blueprint de Render: New > Blueprint > este repositorio. Los valores con `sync: false` se piden en el panel.
+services:
+  - type: web
+    name: the-high-events-api
+    runtime: node
+    plan: free
+    region: virginia
+    # Render fija NODE_ENV=production al ejecutar; las herramientas de compilación son devDependencies
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: TZ
+        value: America/Bogota
+      - key: TRUST_PROXY
+        value: "1"
+      - key: JWT_SECRET
+        generateValue: true
+      # Los planes gratis limitan las conexiones simultáneas
+      - key: DB_POOL
+        value: "5"
+      - key: DB_PORT
+        value: "3306"
+      - key: DB_SSL
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
